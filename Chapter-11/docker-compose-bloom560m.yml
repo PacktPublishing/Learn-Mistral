@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  bloom560m:
+    container_name: bloom560m
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    ports:
+      - "8080:80"
+    environment:
+      - MODEL_ID=bigscience/bloom-560m
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+      - DISABLE_CUSTOM_KERNELS=true
+      - DEVICE=cpu
+      - MAX_INPUT_LENGTH=256
+      - MAX_TOTAL_TOKENS=512
+      - MAX_BATCH_PREFILL_TOKENS=512
+      - MAX_CONCURRENT_REQUESTS=1
+
+
+      

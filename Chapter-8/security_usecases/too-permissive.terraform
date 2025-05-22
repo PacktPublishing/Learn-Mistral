@@ -1,0 +1,97 @@
+# Terraform provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+# VPC
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+# Security Group
+resource "aws_security_group" "example" {
+  name        = "example-security-group"
+  description = "Security group for example application"
+  vpc_id      = aws_vpc.main.id
+
+  # Allow SSH access
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Potential security risk: wide open SSH access
+  }
+
+  # Allow HTTP access
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Potential security risk: wide open HTTP access
+  }
+
+  # Allow HTTPS access
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Egress rule
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] # Open egress rule
+  }
+
+  tags = {
+    Name = "example-security-group"
+  }
+}
+
+# IAM Role
+resource "aws_iam_role" "example" {
+  name               = "example-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  # Inline policy with wide permissions
+  inline_policy {
+    name   = "example-inline-policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect   = "Allow"
+          Action   = "*"
+          Resource = "*" # Potential security risk: overly permissive role
+        }
+      ]
+    })
+  }
+}
+
+# Instance
+resource "aws_instance" "example" {
+  ami           = "ami-0c55b159cbfafe1f0" # Replace with a valid AMI
+  instance_type = "t2.micro"
+  subnet_id     = aws_vpc.main.id
+
+  tags = {
+    Name = "example-instance"
+  }
+
+  security_groups = [aws_security_group.example.name]
+}

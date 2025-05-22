@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  mistral8b:
+    container_name: mistral8b
+    image: ghcr.io/huggingface/text-generation-inference:1.4
+    ports:
+      - "8080:80"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]      
+    environment:
+      - MODEL_ID=mistralai/Ministral-8B-Instruct-2410
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+      - DEVICE=cuda
+      - DISABLE_CUSTOM_KERNELS=false
+      - MAX_INPUT_LENGTH=4096
+      - MAX_TOTAL_TOKENS=8192
+      - MAX_BATCH_PREFILL_TOKENS=8192
+      - MAX_CONCURRENT_REQUESTS=2
+
+      
