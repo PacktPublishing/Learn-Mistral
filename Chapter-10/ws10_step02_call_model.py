@@ -3,7 +3,7 @@ import json
 
 client = boto3.client(service_name='bedrock-runtime', region_name='us-east-1')
 
-model_id = 'mistral.mistral-7b-instruct-v0:2'
+model_id = 'mistral.mistral-small-2402-v1:0'
 
 # Payload for Bedrock
 payload = {
@@ -26,8 +26,9 @@ try:
 
     # Extract the model's output
     output_text = result.get("outputs", [{}])[0].get("text", "No response received.")
-    print("Response from Mistral 7B:", output_text)
-    # print("Raw Response from Mistral 7B:", result)
+    print(">>>", payload["prompt"])
+    print("<<<", output_text)
+    # print("Raw Response:", result)
 except Exception as e:
     # Print detailed debug information
     print("Error occurred while invoking the model:")
